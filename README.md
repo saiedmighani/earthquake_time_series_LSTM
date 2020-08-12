@@ -1,4 +1,4 @@
-# The Smart Earthquake System (SES) project: 
+# The Smart Earthquake System (SES) project:
 ## developing a location-based risk factor
 <br>
 
@@ -22,3 +22,6 @@ A decision maker who decides to value a place based on Earthquake probability ma
 
 - ### [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
 So, keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by human before their registration. The API request link does not require any authentication.
+
+- Some links:
+https://www.miamiherald.com/news/nation-world/national/article244851172.html
