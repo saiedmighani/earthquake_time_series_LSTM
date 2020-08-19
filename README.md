@@ -20,7 +20,7 @@ A decision maker who decides to value a place based on Earthquake probability ma
 - e: Build a location-based (get Street address find in google map) risk factor based on observations.<br>
 
 
-- ### [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
+- ### [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods): Also, important [link](https://earthquake.usgs.gov/data/comcat/data-eventterms.php#rms)
 So, keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by human before their registration. The API request link does not require any authentication.
 
 - Some links:
