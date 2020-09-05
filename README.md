@@ -1,14 +1,10 @@
-# The Smart Earthquake System (SES) project:
-## developing a location-based risk factor
+# Time-series based analysis of Earthquake Risk Factors
+## A practical approach for risk analysis of the "Big One"
 <br>
 
 - ### Project goal:
 
-To predict the safe/vulnerable situation of a location and home to Earthquakes.
-
-- ### Project goal:
-
-A decision maker who decides to value a place based on Earthquake probability maps
+Or goal is to predict the safe/vulnerable situation of a location and home to Earthquakes. Several potential clients such as a decision maker who decides to value a house based on Earthquake probability maps could immediately benefit from this model.
 
 - ### System design:
 
