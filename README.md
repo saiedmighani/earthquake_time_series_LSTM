@@ -1,10 +1,33 @@
-# Earthquake time-series forecasts using Anomaly Detections in the earhtquake sequence
+# Earthquake sequence forecast using a coupled clustering/time-series anomaly detection
 ## A practical approach for risk analysis of the "Big One"
 <br>
 
 ### Problem statement:
 
 San Andreas fault extends nearly 700 miles from NW-SE California along the coast. This fault is responsible for the notorious 1906 San Francisco Earthquake, and the later Loma Prieta and Parkfield earthquakes. Can we train a model on Lomé Prieta and see whether the mode validates on Parkfield? How certain can we be of the developed model?
+
+### Historic California Earthquakes with M > 6[link](https://scedc.caltech.edu/significant/chron-index.html):
+
+| Earthquake | Date | Magnitude | Casulaty | Economic damage | Link |
+| --- | --- | --- | --- | --- | --- |
+| Ridgecrest | July 5, 2019 | 7.1| --- | 1B | --- |
+| Ridgecrest | July 4, 2019 | 6.4| --- | --- | --- |
+| American Canyon (South Napa) | August 24, 2014 | 6.0| 1 | 0.4 B | --- |
+| El Mayor-Cucapah (Baja CA/Mexico) | April 4, 2010 | 7.2 | --- | --- | --- |
+| Eureka | January 9, 2010 | 6.5 | --- | --- | --- |
+| Parkfield | September 28, 2004 | 6.0 | --- | --- | --- |
+| San Simeon | December 22, 2003 | 6.5 | 2 | --- | --- |
+| Hector Mine  | October 16, 1999 | 7.1 | --- | --- | --- |
+| Mendocino | 1 September 1994 | 7.0 | --- | --- | --- |
+| Northridge | January 17, 1994 | 6.7 | --- | 20 | --- |
+| Landers & Big Bear | June 28, 1992 | 7.3 | --- | --- | --- |
+| Cape Mendocino | April 25, 1992 | 7.2 | --- | --- | --- |
+| Loma Prieta (World Series) | October 17, 1989 | 6.9 | --- | --- | --- |
+| Chalfant Valley | July 21, 1986 | 6.5 | --- | --- | --- |
+| Morgan Hill  | April 24, 1984 | 6.2 | --- | --- | --- |
+| Coalinga | May 2, 1983 | 6.7 | --- | --- | --- |
+| Humboldt | November 8, 1980 | 7.0 | --- | --- | --- |
+| Eureka | 8 November 1980 | 7.2 | --- | --- | --- |
 
 ### Project structure and model 
 The project directory is structured as follows:
