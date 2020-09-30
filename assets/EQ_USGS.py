@@ -105,9 +105,23 @@ def clean_EQ_USGS_df(df):
 
         coord_values = df_clean["coordinates"][i].replace("[", "").replace("]", "").replace(",", "").split()
 
-        long.append(float(coord_values[0]))
-        lat.append(float(coord_values[1]))
-        dep.append(float(coord_values[2]))
+        try:
+            long.append(float(coord_values[0]))
+        except:
+            long.append(float("NaN"))
+        
+        try:
+            lat.append(float(coord_values[1]))
+        except:
+            lat.append(float("NaN"))
+            
+        try:
+            dep.append(float(coord_values[2]))
+        except:
+            dep.append(float("NaN"))
+            
+            
+        
 
     df_clean["longitude"] = long
     df_clean["latitude"] = lat

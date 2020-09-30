@@ -4,9 +4,9 @@
 
 ### Problem statement:
 
-San Andreas fault extends nearly 700 miles from NW-SE California along the coast. This fault is responsible for the notorious 1906 San Francisco Earthquake, and the later Loma Prieta and Parkfield earthquakes. Can we train a model on Lomé Prieta and see whether the mode validates on Parkfield? How certain can we be of the developed model?
+California has experienced an enormous life and economical cost for centuries due to unexpected Earthquake hazards. I collected the earthquake data over half-a-century in California, containing notorious damaging historical earthquakes. Can we train a model on california earthquakes which could predict the main earthquake from the time-series sequence? How certain can we be of the developed model?
 
-### Historic California Earthquakes with M > 6[link](https://scedc.caltech.edu/significant/chron-index.html):
+### Historic California Earthquakes with M > 6 [link](https://scedc.caltech.edu/significant/chron-index.html):
 
 | Earthquake | Date | Magnitude | Casulaty | Economic damage | Link |
 | --- | --- | --- | --- | --- | --- |
@@ -90,4 +90,7 @@ I finally tried this hybrid modeling technique on a new dataset, belonging to Pa
 ### Recommendations
 1 - Apply this analysis to other earthquakes in other fault systems and see whether it generalizes.
 
-2 - If it generalizes, then using the wealth of data to look into deep learning techniques in detecting these times-series anomalies.
+2 - If it generalizes, then using the wealth of data to look into deep learning techniques in detecting these times-series anomalies.<br>
+### References:
+1- Time-series:
+- Plagianakos, V.P. and Tzanaki, E., 2001, July. Chaotic analysis of seismic time series and short term forecasting using neural networks. In IJCNN'01. International Joint Conference on Neural Networks. Proceedings (Cat. No. 01CH37222) (Vol. 3, pp. 1598-1602). IEEE.
