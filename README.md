@@ -2,6 +2,8 @@
 ## A practical approach for risk analysis of the "Big One"
 <br>
 
+### [Medium article: part I](https://towardsdatascience.com/earthquake-time-series-forecasts-using-a-hybrid-clustering-lstm-approach-part-i-eda-6797b22aed8c)
+
 ### Problem statement:
 
 California has experienced an enormous life and economical cost for centuries due to unexpected Earthquake hazards. I collected the earthquake data over half-a-century in California, containing notorious damaging historical earthquakes. Can we train a model on california earthquakes which could predict the main earthquake from the time-series sequence? How certain can we be of the developed model?
@@ -66,7 +68,7 @@ The Earthquake data from San Andreas fault was collected from USGS API, which wa
 Figure 1. San Andreas fault geometry, where the notorious Loma Prieta and Parkfield earthquakes occurred. [Source: USGS graphic]<br><br>
 
 
-[USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods): Also, important [link](https://earthquake.usgs.gov/data/comcat/data-eventterms.php#rms)
+[USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
 So, keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government-operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by humans before their registration. The API request link does not require any authentication.
 ### EDA
 
