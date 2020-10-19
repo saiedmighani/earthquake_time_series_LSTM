@@ -7,7 +7,7 @@
 ### Difficulties with Forecasting Earthquake Time-series
 Figure below shows the sequence of foreshocks (before the main earthquake), the main magnitude 6.9 earthquake, and the aftershocks (following the main earthquake), during the 1989 Loma Prieta earthquake (63 casualties, 10 billion dollars damage). The main earthquake occurred almost without any large precursory signals. This complicates the task of earthquake forecast for more conventional time-series models such as the autoregressive ones.
 <div style="text-align:center"><img src="assets/Lome_prieta.png" /></div>
-
+Figure: Earthquake sequences during the magnitude 6.9 Loma Prieta occurred in 1989. Note the occurrence of main earthquake without prior precursory large events (Image by author).
 
 ### Problem statement:
 
@@ -70,7 +70,7 @@ The modeling process in the current blog post is comprised of the following cons
 The Earthquake data from San Andreas fault was collected from USGS API, which was publicly available. We selected earthquakes from a single fault to compare, hoping to at least isolate the fault structure effects and focus on the earthquake time-series. For this study, we worked on 6.9-magnitude Loma Prieta (1989) and 6.0-magnitude Parkfield (2004) Earthquake data. These earthquakes occurred the locked and creeping segments of the San Andreas fault, respectively. Although the magnitude of the Parkfield was expected, its timing was not expected, making it an interesting test dataset for our model effort.
 
 <div style="text-align:center"><img src="assets/San_Andreas.png" /></div>
-Figure 1. San Andreas fault geometry, where the notorious Loma Prieta and Parkfield earthquakes occurred. [Source: USGS graphic]<br><br>
+Figure: San Andreas fault geometry, where the notorious Loma Prieta and Parkfield earthquakes occurred. [Source: USGS graphic]<br><br>
 
 
 [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
@@ -80,10 +80,10 @@ So, keeping all the things in mind, I have decided to go with the United States 
 The downloaded data contained a wealth of information, including the timing of event, moment magnitudes, intensity (evaluated by a human), and inverted three-dimensional location of the earthquakes. For data size considerations, we only considered earthquakes with moment magnitudes larger than 2 as more important ones.
 
 #### Correlation between location and magnitude
-To better understand the dataset, I assessed the correlation between variables in the dataframe. The 2D histograms (Figure 5) showed that the majority of the earthquakes occurred in NW-SE, loosely aligning with a certain lineation. Also, the magnitude-depth distribution suggested that major earthquakes occurred at a depth of nearly 10 km. This suggests that we can use clustering techniques to come up with some engineered features and try to see whether they help us for the forecast problem.
+To better understand the dataset, I assessed the correlation between variables in the dataframe. The 2D histograms (Figure below) showed that the majority of the earthquakes occurred in NW-SE, loosely aligning with a certain lineation. Also, the magnitude-depth distribution suggested that major earthquakes occurred at a depth of nearly 10 km. This suggests that we can use clustering techniques to come up with some engineered features and try to see whether they help us for the forecast problem.
 <div style="text-align:center"><img src="assets/corr_lat_long.png" /></div>
 <div style="text-align:center"><img src="assets/corr_dep_mag.png" /></div>
-
+Figure: 2D histograms of entire dataset. Top: There is strong lineation NW-SE between longitude-latitude. Bottom: At the depth of ~10 km, there seems to be clustering of major earthquakes (Image by author).<br>
 ### Feature Engineering: Spatial Clustering
 Figure below shows a schematic concept for developing the features. As the figure is self-descriptive, I will not go through the explanations. I used DBSCAN algorithm to cluster the events for every 20 consecutive earthquakes beginning from the first datapoint. I used longitude, latitude, and depth for a 3D clustering. We can define three features as a result of clustering:
 1 — event density (or spatial size of cluster).
@@ -91,16 +91,18 @@ Figure below shows a schematic concept for developing the features. As the figur
 3- Cluster mass center translation.
 [The hyperparameters for the DBSCAN were eps = 0.2 and min_samples=5].
 <div style="text-align:center"><img src="assets/Medium_cluster_a.jpg" /></div>
-
+Figure: Translation and transformation with time as clusters of earthquake evolve. We could use these changes as features for earthquake forecasts (Image by author).
 
 ### Feature importance
 
 For an initial assessment on the developed features, I filtered only the section of the time-series data before the main Loma Prieta Earthquake. I averaged the data for every 20 rows and added the features derived from the spatial clustering to the original dataframe columns.
 Finally, I added a target label as the time to the main Loma Prieta Earthquake (time_to_failure).<br>
-A single regression analysis was run for preliminary assessment of the features. Note that this regression is only for exploratory purposes, and the results need to be cross-validated on other distinct test earthquake datasets as a future effort. The following correlation map (Figure 7) shows that the features are in fact strong indicators of the time to the main earthquake.<br>
+A single regression analysis was run for preliminary assessment of the features. Note that this regression is only for exploratory purposes, and the results need to be cross-validated on other distinct test earthquake datasets as a future effort. The following correlation map (Figure below) shows that the features are in fact strong indicators of the time to the main earthquake.<br>
 <div style="text-align:center"><img src="plots/EDA_corr_plots.png" /></div>
-The feature importance plot in Figure 8 showed interesting implications. The dept_std, long_std, and lat_std, indicate the aspect ratio of the cluster. This means closer to the failure, the cluster tends to elongate more vertically and longitudinally and less latitudinally. These were the strongest features. Also, density is negatively correlated, meaning that the size of the cluster expands before failure. Another interesting aspect is the mean magnitude of earthquakes which is a curious case. An inspection of the dataset for a few other earthquakes also showed this trend. This means that before the main earthquake happens, the mean magnitude of events in fact declines. In other words, the fault becomes more seismically silent. This is a curious case and needs further study.<br>
+Figure: Correlation between features and the target label (time_to_failure). As can be seen, these are strong indicators of the time to failure. See GitHub repository for full description of columns (Image by author).<br>
+The feature importance plot in Figure below showed interesting implications. The dept_std, long_std, and lat_std, indicate the aspect ratio of the cluster. This means closer to the failure, the cluster tends to elongate more vertically and longitudinally and less latitudinally. These were the strongest features. Also, density is negatively correlated, meaning that the size of the cluster expands before failure. Another interesting aspect is the mean magnitude of earthquakes which is a curious case. An inspection of the dataset for a few other earthquakes also showed this trend. This means that before the main earthquake happens, the mean magnitude of events in fact declines. In other words, the fault becomes more seismically silent. This is a curious case and needs further study.<br>
 <div style="text-align:center"><img src="plots/features.png" /></div>
+Figure: Feature importance based on linear regression on Loma Prieta earthquake. Features are discussed in the text. See GitHub repositopry for full description of columns (Image by author).
 
 I finally tried this hybrid modeling technique on a new dataset, belonging to Parkfield earthquake. It resulted in R^{2} value of 0.98 However, the model could still be more stable, as it is yet overfit.
 
@@ -108,7 +110,7 @@ I finally tried this hybrid modeling technique on a new dataset, belonging to Pa
 
 I used the first 45 years of earthquake to predict the last 5 years using LSTM (timestep of 60). Figure below shows an initial result:
 <div style="text-align:center"><img src="assets/LSTM_mag.png" /></div>
-
+Figure: Preiminary LSTM results.
 
 Although, the model slighly underpredicts the magnitudes globally, still it can capture the main shock event, which seems promising for future efforts.
 
