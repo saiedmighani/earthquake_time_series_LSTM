@@ -1,12 +1,17 @@
-# Earthquake sequence forecast using a coupled clustering/time-series anomaly detection
-## A practical approach for risk analysis of the "Big One"
+# Earthquake Time-series Forecasts using a Hybrid Clustering-LSTM Approach
+## Testing the method on the last 50 years of California’s historic earthquakes
 <br>
 
 ### [Medium article: part I](https://towardsdatascience.com/earthquake-time-series-forecasts-using-a-hybrid-clustering-lstm-approach-part-i-eda-6797b22aed8c)
 
+### Difficulties with Forecasting Earthquake Time-series
+Figure below shows the sequence of foreshocks (before the main earthquake), the main magnitude 6.9 earthquake, and the aftershocks (following the main earthquake), during the 1989 Loma Prieta earthquake (63 casualties, 10 billion dollars damage). The main earthquake occurred almost without any large precursory signals. This complicates the task of earthquake forecast for more conventional time-series models such as the autoregressive ones.
+<div style="text-align:center"><img src="assets/Lome_prieta.png" /></div>
+
+
 ### Problem statement:
 
-California has experienced an enormous life and economical cost for centuries due to unexpected Earthquake hazards. I collected the earthquake data over half-a-century in California, containing notorious damaging historical earthquakes. Can we train a model on california earthquakes which could predict the main earthquake from the time-series sequence? How certain can we be of the developed model?
+San Andreas fault extends nearly 700 miles from NW-SE California along the coast. This fault is responsible for the notorious 1906 San Francisco Earthquake, and the later Loma Prieta and Parkfield earthquakes. But, this is not the only fault system, and earthquakes occur on many nearby faults which may even interact in a complex way. Are there any systematics in the occurrence of these earthquakes? And, if there is, can they help us discern how smaller earthquakes grow, leading to larger earthquakes? The analysis here is more data-based rather than being physics-based. This means, any earthquake with any magnitude and at any distance has the same weight of importance to predict the major earthquake; and, there are no prior assumptions. ONLY, the statistical analysis decides on the weight of importance for an earthquake.
 
 ### Historic California Earthquakes with M > 6 [link](https://scedc.caltech.edu/significant/chron-index.html):
 
@@ -69,30 +74,44 @@ Figure 1. San Andreas fault geometry, where the notorious Loma Prieta and Parkfi
 
 
 [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
-So, keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government-operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by humans before their registration. The API request link does not require any authentication.
-### EDA
+So, keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government-operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by humans before their registration. The API request link does not require any authentication.<br>
+### EDA — 50 years of earthquake data
 
-The downloaded data contained a wealth of data, including the moment magnitudes and inverted three - dimensional location of the earthquakes. Plus, even earthquakes as small as magnitude 1. An initial look at the temporal evolution of the magnitudes suggested a sudden spike in the time-series, without much early notice. This suggests that simple time-series analysis techniques such as linear ARIMA, VRA models would not be adequate and we need to consider more sophisticated ML models. Along with trying different models, we also engineered features such as earthquake spatial density as I will elaborate in the next section.
+The downloaded data contained a wealth of information, including the timing of event, moment magnitudes, intensity (evaluated by a human), and inverted three-dimensional location of the earthquakes. For data size considerations, we only considered earthquakes with moment magnitudes larger than 2 as more important ones.
 
-<div style="text-align:center"><img src="plots/EDA_long_lat.png" /></div>
+#### Correlation between location and magnitude
+To better understand the dataset, I assessed the correlation between variables in the dataframe. The 2D histograms (Figure 5) showed that the majority of the earthquakes occurred in NW-SE, loosely aligning with a certain lineation. Also, the magnitude-depth distribution suggested that major earthquakes occurred at a depth of nearly 10 km. This suggests that we can use clustering techniques to come up with some engineered features and try to see whether they help us for the forecast problem.
+<div style="text-align:center"><img src="assets/corr_lat_long.png" /></div>
+<div style="text-align:center"><img src="assets/corr_dep_mag.png" /></div>
 
-<div style="text-align:center"><img src="plots/EDA_depth_lat.png" /></div>
-Figure 1. San Andreas fault geometry, where the notorious Loma Prieta and Parkfield earthquakes occurred. <br>
-### Modeling
-After initial linear regression attempts, I decided to make a hybrid model, which combines the clustering analysis with linear regression. For clustering, I used DBSCAN and then inferred some engineering features related to:<br>
-1- event density<br>
-2 - aspect ratio (std)<br>
-3 – mass center transformation<br>
-Based on the correlation, the engineered features seem relevant, meaning that the clustering analysis in fact has taken lots of non-linearities in the earthquake occurrence into account:
+### Feature Engineering: Spatial Clustering
+Figure below shows a schematic concept for developing the features. As the figure is self-descriptive, I will not go through the explanations. I used DBSCAN algorithm to cluster the events for every 20 consecutive earthquakes beginning from the first datapoint. I used longitude, latitude, and depth for a 3D clustering. We can define three features as a result of clustering:
+1 — event density (or spatial size of cluster).
+2 — Aspect ratio (3D shape of the cluster).
+3- Cluster mass center translation.
+[The hyperparameters for the DBSCAN were eps = 0.2 and min_samples=5].
+<div style="text-align:center"><img src="assets/Medium_cluster_a.jpg" /></div>
+
+
+### Feature importance
+
+For an initial assessment on the developed features, I filtered only the section of the time-series data before the main Loma Prieta Earthquake. I averaged the data for every 20 rows and added the features derived from the spatial clustering to the original dataframe columns.
+Finally, I added a target label as the time to the main Loma Prieta Earthquake (time_to_failure).<br>
+A single regression analysis was run for preliminary assessment of the features. Note that this regression is only for exploratory purposes, and the results need to be cross-validated on other distinct test earthquake datasets as a future effort. The following correlation map (Figure 7) shows that the features are in fact strong indicators of the time to the main earthquake.<br>
 <div style="text-align:center"><img src="plots/EDA_corr_plots.png" /></div>
-And, below is the feature importance figure:
+The feature importance plot in Figure 8 showed interesting implications. The dept_std, long_std, and lat_std, indicate the aspect ratio of the cluster. This means closer to the failure, the cluster tends to elongate more vertically and longitudinally and less latitudinally. These were the strongest features. Also, density is negatively correlated, meaning that the size of the cluster expands before failure. Another interesting aspect is the mean magnitude of earthquakes which is a curious case. An inspection of the dataset for a few other earthquakes also showed this trend. This means that before the main earthquake happens, the mean magnitude of events in fact declines. In other words, the fault becomes more seismically silent. This is a curious case and needs further study.<br>
 <div style="text-align:center"><img src="plots/features.png" /></div>
 
 I finally tried this hybrid modeling technique on a new dataset, belonging to Parkfield earthquake. It resulted in R^{2} value of 0.98 However, the model could still be more stable, as it is yet overfit.
-### Recommendations
-1 - Apply this analysis to other earthquakes in other fault systems and see whether it generalizes.
 
-2 - If it generalizes, then using the wealth of data to look into deep learning techniques in detecting these times-series anomalies.<br>
-### References:
-1- Time-series:
-- Plagianakos, V.P. and Tzanaki, E., 2001, July. Chaotic analysis of seismic time series and short term forecasting using neural networks. In IJCNN'01. International Joint Conference on Neural Networks. Proceedings (Cat. No. 01CH37222) (Vol. 3, pp. 1598-1602). IEEE.
+### LSTM preliminary results
+
+I used the first 45 years of earthquake to predict the last 5 years using LSTM (timestep of 60). Figure below shows an initial result:
+<div style="text-align:center"><img src="assets/LSTM_mag.png" /></div>
+
+
+Although, the model slighly underpredicts the magnitudes globally, still it can capture the main shock event, which seems promising for future efforts.
+
+### Future work
+
+Next, I will implement the spatial clustering features into the LSTM model for improved model metrics.
