@@ -112,7 +112,7 @@ I used the first 45 years of earthquake to predict the last 5 years using LSTM (
 <div style="text-align:center"><img src="assets/LSTM_mag.png" /></div>
 Figure: Preiminary LSTM results.
 
-Although, the model slighly underpredicts the magnitudes globally, still it can capture the main shock event, which seems promising for future efforts.
+Although, the model slighly underpredicts the amplitude of magnitudes globally, still it can capture the main shock events (e.g., around x-values of 12,000, 15,000 and 1160,000 in the above plot), which seems promising for future efforts.
 
 ### Future work
 
