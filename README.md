@@ -29,7 +29,7 @@ San Andreas fault extends nearly 700 miles from NW-SE California along the coast
 | Northridge | January 17, 1994 | 6.7 | --- | 20 | --- |
 | Landers & Big Bear | June 28, 1992 | 7.3 | --- | --- | --- |
 | Cape Mendocino | April 25, 1992 | 7.2 | --- | --- | --- |
-| Loma Prieta (World Series) | October 17, 1989 | 6.9 | --- | --- | --- |
+| Loma Prieta (World Series) | October 17, 1989 | 6.9 | 67 | 5 B | [Link](https://en.wikipedia.org/wiki/1989_Loma_Prieta_earthquake) |
 | Chalfant Valley | July 21, 1986 | 6.5 | --- | --- | --- |
 | Morgan Hill  | April 24, 1984 | 6.2 | --- | --- | --- |
 | Coalinga | May 2, 1983 | 6.7 | --- | --- | --- |
@@ -49,8 +49,8 @@ project-SES
 |  |P02_Data_Cleaning.ipynb
 |  |P03_EDA_eq.ipynb
 |  |P04_model_linear_regression.ipynb
-|  |P05_model_clustering_features.ipynb
-|  |P06_model_apply_to_parkfield.ipynb
+|  |P05_feature_eng_parkfield_EQ.ipynb
+|  |P06_model_timeseries.ipynb
 |__ datasets/
 |__ plots/
 |__ Executive_summary_slides.pdf
@@ -67,23 +67,24 @@ The modeling process in the current blog post is comprised of the following cons
 
 ### Data Preparation
 
-The Earthquake data from San Andreas fault was collected from USGS API, which was publicly available. We selected earthquakes from a single fault to compare, hoping to at least isolate the fault structure effects and focus on the earthquake time-series. For this study, we worked on 6.9-magnitude Loma Prieta (1989) and 6.0-magnitude Parkfield (2004) Earthquake data. These earthquakes occurred the locked and creeping segments of the San Andreas fault, respectively. Although the magnitude of the Parkfield was expected, its timing was not expected, making it an interesting test dataset for our model effort.
+I used USGS API to pull the earthquake data for the last 50 years near the state of California. The API is publicly available thanks to USGS. To download an inclusive enough catalog of earthquakes, I downloaded the earthquakes beyond the state of California from a wide longitude and latitude range of (-133, -107) and (24, 50) degrees respectively (well beyond California).
 
 <div style="text-align:center"><img src="assets/San_Andreas.png" /></div>
 Figure: San Andreas fault geometry, where the notorious Loma Prieta and Parkfield earthquakes occurred. [Source: USGS graphic]<br><br>
 
 
 [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
-So, keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government-operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by humans before their registration. The API request link does not require any authentication.<br>
+Keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government-operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by humans before their registration. The API request link does not require any authentication.<br>
 ### EDA — 50 years of earthquake data
 
-The downloaded data contained a wealth of information, including the timing of event, moment magnitudes, intensity (evaluated by a human), and inverted three-dimensional location of the earthquakes. For data size considerations, we only considered earthquakes with moment magnitudes larger than 2 as more important ones.
+The downloaded data contained a wealth of information, including the timing of event, moment magnitudes, intensity (evaluated by a human), and inverted three-dimensional location of the earthquakes. For data size considerations, we only considered earthquakes with moment magnitudes larger than 2 as the more important ones.
 
 #### Correlation between location and magnitude
 To better understand the dataset, I assessed the correlation between variables in the dataframe. The 2D histograms (Figure below) showed that the majority of the earthquakes occurred in NW-SE, loosely aligning with a certain lineation. Also, the magnitude-depth distribution suggested that major earthquakes occurred at a depth of nearly 10 km. This suggests that we can use clustering techniques to come up with some engineered features and try to see whether they help us for the forecast problem.
 <div style="text-align:center"><img src="assets/corr_lat_long.png" /></div>
 <div style="text-align:center"><img src="assets/corr_dep_mag.png" /></div>
 Figure: 2D histograms of entire dataset. Top: There is strong lineation NW-SE between longitude-latitude. Bottom: At the depth of ~10 km, there seems to be clustering of major earthquakes (Image by author).<br>
+
 ### Feature Engineering: Spatial Clustering
 Figure below shows a schematic concept for developing the features. As the figure is self-descriptive, I will not go through the explanations. I used DBSCAN algorithm to cluster the events for every 20 consecutive earthquakes beginning from the first datapoint. I used longitude, latitude, and depth for a 3D clustering. We can define three features as a result of clustering:
 1 — event density (or spatial size of cluster).
@@ -104,15 +105,15 @@ The feature importance plot in Figure below showed interesting implications. The
 <div style="text-align:center"><img src="plots/features.png" /></div>
 Figure: Feature importance based on linear regression on Loma Prieta earthquake. Features are discussed in the text. See GitHub repositopry for full description of columns (Image by author).
 
-I finally tried this hybrid modeling technique on a new dataset, belonging to Parkfield earthquake. It resulted in R^{2} value of 0.98 However, the model could still be more stable, as it is yet overfit.
+I finally tried this hybrid modeling technique on a new dataset, belonging to Parkfield earthquake. However, the model could still be made to be more stable, as it is yet overfit.
 
-### LSTM preliminary results
+### Multi-variate LSTM preliminary results
 
-I used the first 45 years of earthquake to predict the last 5 years using LSTM (timestep of 60). Figure below shows an initial result:
+I found LSTM as an appropriate method for my purposes. Two aspects specifically brought my interest towards LSTM sequential analysis: 1 — the irregular nature of my time-series. 2 — the shock-like (anomaly) nature of the earthquake without much apparent precursors. My target label here is "momet magnitude" values. I used the first 45 years of earthquake to predict the moment magnitudes for the last 5 years using LSTM (timestep of 60). Figure below shows an initial result:
 <div style="text-align:center"><img src="assets/LSTM_mag.png" /></div>
-Figure: Preiminary LSTM results.
+Figure: Preiminary LSTM results, considering only the location and timing labels. Future efforts will incorporate the engineered clustering features as well.
 
-Although, the model slighly underpredicts the amplitude of magnitudes globally, still it can capture the main shock events (e.g., around x-values of 12,000, 15,000 and 1160,000 in the above plot), which seems promising for future efforts.
+Although the model slighly underpredicts the amplitude of magnitudes globally, still it can capture the main shock events (e.g., around x-values of 12,000, 15,000 and 16,000 in the above plot which were all earthquakes with magnitude > 6), which seems promising for future efforts.
 
 ### Future work
 
