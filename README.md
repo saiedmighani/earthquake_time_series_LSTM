@@ -75,17 +75,19 @@ Figure: San Andreas fault geometry, where the notorious Loma Prieta and Parkfiel
 
 [USGS API](https://earthquake.usgs.gov/fdsnws/event/1/#methods):
 Keeping all the things in mind, I have decided to go with the United States Geological Survey(USGS) for earthquake data. USGS provides a very intuitive, easy-to-use, reliable API and web portal service, which provides flexibility in output format, specifying regions of interest and more. USGS is a government-operated research center and the data they provide are free of cost and are very reliable because most of them are reviewed by humans before their registration. The API request link does not require any authentication.<br>
-### EDA — 50 years of earthquake data
+
+## Part I - EDA analysis and unsupervised clustering
+### 1.1 EDA — 50 years of earthquake data
 
 The downloaded data contained a wealth of information, including the timing of event, moment magnitudes, intensity (evaluated by a human), and inverted three-dimensional location of the earthquakes. For data size considerations, we only considered earthquakes with moment magnitudes larger than 2 as the more important ones.
 
-#### Correlation between location and magnitude
+#### 1.2 Correlation between location and magnitude
 To better understand the dataset, I assessed the correlation between variables in the dataframe. The 2D histograms (Figure below) showed that the majority of the earthquakes occurred in NW-SE, loosely aligning with a certain lineation. Also, the magnitude-depth distribution suggested that major earthquakes occurred at a depth of nearly 10 km. This suggests that we can use clustering techniques to come up with some engineered features and try to see whether they help us for the forecast problem.
 <div style="text-align:center"><img src="assets/corr_lat_long.png" /></div>
 <div style="text-align:center"><img src="assets/corr_dep_mag.png" /></div>
 Figure: 2D histograms of entire dataset. Top: There is strong lineation NW-SE between longitude-latitude. Bottom: At the depth of ~10 km, there seems to be clustering of major earthquakes (Image by author).<br>
 
-### Feature Engineering: Spatial Clustering
+### 1.3 Feature Engineering: Spatial Clustering
 Figure below shows a schematic concept for developing the features. As the figure is self-descriptive, I will not go through the explanations. I used DBSCAN algorithm to cluster the events for every 20 consecutive earthquakes beginning from the first datapoint. I used longitude, latitude, and depth for a 3D clustering. We can define three features as a result of clustering:
 1 — event density (or spatial size of cluster).
 2 — Aspect ratio (3D shape of the cluster).
@@ -94,7 +96,7 @@ Figure below shows a schematic concept for developing the features. As the figur
 <div style="text-align:center"><img src="assets/Medium_cluster_a.jpg" /></div>
 Figure: Translation and transformation with time as clusters of earthquake evolve. We could use these changes as features for earthquake forecasts (Image by author).
 
-### Feature importance
+### 1.4 Feature importance
 
 For an initial assessment on the developed features, I filtered only the section of the time-series data before the main Loma Prieta Earthquake. I averaged the data for every 20 rows and added the features derived from the spatial clustering to the original dataframe columns.
 Finally, I added a target label as the time to the main Loma Prieta Earthquake (time_to_failure).<br>
@@ -106,8 +108,8 @@ The feature importance plot in Figure below showed interesting implications. The
 Figure: Feature importance based on linear regression on Loma Prieta earthquake. Features are discussed in the text. See GitHub repositopry for full description of columns (Image by author).
 
 I finally tried this hybrid modeling technique on a new dataset, belonging to Parkfield earthquake. However, the model could still be made to be more stable, as it is yet overfit.
-
-### Multi-variate LSTM preliminary results
+## Part II - Time-series anlaysis using LSTM (regression approach)
+### 2.1 Multi-variate LSTM preliminary results
 
 I found LSTM as an appropriate method for my purposes. Two aspects specifically brought my interest towards LSTM sequential analysis: 1 — the irregular nature of my time-series. 2 — the shock-like (anomaly) nature of the earthquake without much apparent precursors. My target label here is "momet magnitude" values. I used the first 45 years of earthquake to predict the moment magnitudes for the last 5 years using LSTM (timestep of 60). Figure below shows an initial result:
 <div style="text-align:center"><img src="assets/LSTM_mag.png" /></div>
@@ -115,6 +117,6 @@ Figure: Preiminary LSTM results, considering only the location and timing labels
 
 Although the model slighly underpredicts the amplitude of magnitudes globally, still it can capture the main shock events (e.g., around x-values of 12,000, 15,000 and 16,000 in the above plot which were all earthquakes with magnitude > 6), which seems promising for future efforts.
 
-### Future work
+## Future work
 
 Next, I will implement the spatial clustering features into the LSTM model for improved model metrics.
