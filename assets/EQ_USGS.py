@@ -92,7 +92,7 @@ def clean_EQ_USGS_df(df):
     """
 
     # Getting only the useful columns
-    df_clean = df[['index', 'type', "time", "coordinates", "mag", "place", "status", "tsunami", "sig", "net", 
+    df_clean = df[['type', "time", "coordinates", "mag", "place", "status", "tsunami", "sig", "net", 
                      "nst", "dmin", "rms", "gap", "magType"]].copy()
 
     # Parsing the coordinates
